@@ -57,13 +57,13 @@ public class SampleController {
 	@RequestMapping(value = "/login")
 	public String getLogin(Model model, HttpServletRequest request, HttpServletResponse reponse) throws Exception {
 		model.addAttribute("memberDto", new MemberDto());
-		System.out.println("로그인하러옴");
+		System.out.println("濡쒓렇�씤�븯�윭�샂");
 		return "login";
 	}
 
 	@RequestMapping(value = "/post")
 	public String getPost(Model model, HttpServletRequest request, HttpServletResponse reponse) throws Exception {
-		System.out.println("포스트");
+		System.out.println("�룷�뒪�듃");
 		return "post";
 	}
 
@@ -90,12 +90,12 @@ public class SampleController {
 
 	@RequestMapping(value = "/join.do")
 	public String doJoin(@ModelAttribute MemberDto mem, HttpServletResponse reponse) throws Exception {
-		// db�� ȸ������
+		// db占쏙옙 회占쏙옙占쏙옙占쏙옙
 		MemberDAO ma = MemberDAO.getInstance();
 		if (ma.insert_user(mem)) {
-			System.out.println("아이디 생성 성공");
+			System.out.println("�븘�씠�뵒 �깮�꽦 �꽦怨�");
 		} else {
-			System.out.println("ID or Phone 중복");
+			System.out.println("ID or Phone 以묐났");
 		}
 
 		return "redirect:/sample/";
@@ -260,7 +260,7 @@ public class SampleController {
 	public String getRank(Model model, HttpServletRequest request, HttpServletResponse reponse) throws Exception {
 		MemberDAO md = MemberDAO.getInstance();
 		ArrayList<MemberDto> list_ranking = md.ranking();
-		// 맞은 문제 순으로 정렬하기.
+		// 留욎� 臾몄젣 �닚�쑝濡� �젙�젹�븯湲�.
 		Collections.sort(list_ranking);
 
 		model.addAttribute("list_ranking", list_ranking);
@@ -284,7 +284,7 @@ public class SampleController {
 		return msg;
 	}
 
-//	/produces = "application/text; charset=utf8" 한글깨짐 수정법, json 보낼떈 application/json;
+//	/produces = "application/text; charset=utf8" �븳湲�源⑥쭚 �닔�젙踰�, json 蹂대궪�뻽 application/json;
 	@ResponseBody
 	@RequestMapping(value = "/getChat", produces = "application/text; charset=utf8")
 	public String getChat(HttpServletRequest request, HttpServletResponse reponse) throws Exception {
@@ -301,5 +301,40 @@ public class SampleController {
 		System.out.println(str);
 		return msg;
 	}
-
+	//jihun add
+	@RequestMapping(value = "/post.jsp")
+	public String getPost(HttpServletRequest request, HttpServletResponse reponse) throws Exception {
+		System.out.println("write");
+		return "post";
+	}
+	@RequestMapping(value = "/write.jsp")
+	public String getWritejsp(HttpServletRequest request, HttpServletResponse reponse) throws Exception {
+		System.out.println("write");
+		return "write";
+	}
+	@RequestMapping(value = "/writeAction.jsp")
+	public String getWriteActionjsp(HttpServletRequest request, HttpServletResponse reponse) throws Exception {
+		System.out.println("writeAction");
+		return "writeAction";
+	}
+	@RequestMapping(value = "/view.jsp")
+	public String getView(HttpServletRequest request, HttpServletResponse reponse) throws Exception {
+		System.out.println("view");
+		return "view";
+	}
+	@RequestMapping(value = "/update.jsp")
+	public String getUpdate(HttpServletRequest request, HttpServletResponse reponse) throws Exception {
+		System.out.println("update");
+		return "update";
+	}
+	@RequestMapping(value = "/updateAction.jsp")
+	public String getUpdateActionjsp(HttpServletRequest request, HttpServletResponse reponse) throws Exception {
+		System.out.println("updateAction");
+		return "updateAction";
+	}
+	@RequestMapping(value = "/deleteAction.jsp")
+	public String getDeleteActionjsp(HttpServletRequest request, HttpServletResponse reponse) throws Exception {
+		System.out.println("deleteAction");
+		return "deleteAction";
+	}
 }

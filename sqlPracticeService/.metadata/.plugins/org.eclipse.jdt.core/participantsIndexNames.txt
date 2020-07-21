@@ -1,0 +1,5 @@
+INDEX VERSION 1.131
+C:\Users\kitri\Desktop\mini_project\sqlPracticeService\.metadata\.plugins\org.eclipse.jst.jsp.core\jspsearch\805836054.index
+\board\src\main\java
+C:\Users\kitri\Desktop\mini_project\sqlPracticeService\.metadata\.plugins\org.eclipse.jst.jsp.core\jspsearch\1166345979.index
+\board\src\main\java

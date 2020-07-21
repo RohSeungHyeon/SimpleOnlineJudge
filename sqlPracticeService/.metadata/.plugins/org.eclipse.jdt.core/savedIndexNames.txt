@@ -1,0 +1,4 @@
+INDEX VERSION 1.131+C:\Users\kitri\Desktop\mini_project\sqlPracticeService\.metadata\.plugins\org.eclipse.jdt.core
+3543422066.index
+1425716597.index
+4114157239.index

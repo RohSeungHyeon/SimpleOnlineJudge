@@ -44,7 +44,7 @@
 <meta name="username" content="">
 
 
-<title>게시판</title>
+<title>질문 게시판</title>
 <style>
 input[type="submit"] {
 	/* change these properties to whatever you want */
@@ -53,6 +53,8 @@ input[type="submit"] {
 	border-radius: 5px;
 }
 </style>
+<script
+	src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 </head>
 <body>
 	<div class="header no-print">
@@ -71,6 +73,8 @@ input[type="submit"] {
 					%>
 					<li>${member.getName()}님 반갑습니다!</li>
 					<li class="topbar-devider"></li>
+					<li><a href="/board/sample/home" class="username">문제 게시판</a></li>
+					<li class="topbar-devider"></li>
 					<li><a href="/board/sample/mypage" class="username">마이 페이지</a></li>
 					<li class="topbar-devider"></li>
 					<li><a href="/board/sample/logout.do" class="username">로그아웃</a></li>
@@ -83,15 +87,17 @@ input[type="submit"] {
 					<li><a href="/board/sample/tableCreate">테이블 만들기</a></li>
 					<li class="topbar-devider"></li>
 
-					<%}%>
+					<%
+						}
+					%>
 					<li><a href="/board/sample/rank">순위보기</a>
 					<li class="topbar-devider"></li>
 
 					<li><a href="/board/sample/post">공지사항</a></li>
 					<li class="topbar-devider"></li>
-					
+
 					<li><a href="/board/sample/questionlist">질문 게시판</a></li>
-					
+
 				</ul>
 			</div>
 		</div>
@@ -99,82 +105,42 @@ input[type="submit"] {
 
 
 	<div class="text-center" style="font-weight: bold; font-size: 5rem">
-		SQL 문제 게시판</div>
+		질문 게시판</div>
 
 	<div class="col-md-12">
 		<div class="table-responsive">
 			<table
 				class="table table-striped table-bordered sortable-table clickable-table"
-				id="problemset">
+				id="questionset">
 				<thead>
 					<tr>
-						<th style="width: 25%" data-sort="int">문제 번호</th>
-						<th style="width: 50%" data-sort="string">제목</th>
-						<th style="width: 7%" data-sort="int">정답</th>
-						<th style="width: 15%" data-sort="int">제출</th>
-						<th style="width: 8%" data-sort="float">정답 비율</th>
+						<th style="width: 8%; text-align: center" data-sort="int">순번</th>
+						<th style="width: 50%; text-align: center" data-sort="string">제목</th>
+						<th style="width: 7%; text-align: center" data-sort="int">관련문제</th>
+						<th style="width: 25%; text-align: center" data-sort="String">작성자</th>
+						<th style="width: 15%; text-align: center" data-sort="int">댓글 수</th>
 					</tr>
 				</thead>
 				<tbody>
-					<c:forEach items="${list}" var="list">
-						<tr>
-							<td><a
-								href='<c:url value='/sample/problem?p_no=${list.getP_num()}'/>'>${list.getP_num()}</a></td>
-							<td><c:out value="${list.getP_title()}" /></td>
-							<td><c:out value="${list.getOk_cnt()}" /></td>
-							<td><c:out value="${list.getSub_cnt()}" /></td>
-							<c:if test="${list.getSub_cnt()==0}">
-								<td>0%</td>
-							</c:if>
-							<c:if test="${list.getSub_cnt()!=0}">
-								<td><c:out
-										value="${ list.getOk_cnt()*100/list.getSub_cnt()}%" /></td>
-							</c:if>
-						</tr>
-					</c:forEach>
+					<c:if test="${questionList.size()  > 0}">
+						<c:forEach var="i" begin="0" end="${questionList.size() - 1}">
+							<tr>
+								<td><a
+									href='<c:url value='/sample/question?m_id=${questionList.get(i).getM_id()}&prob_num=${questionList.get(i).getProb_num()}&qst_date=${questionList.get(i).getQst_date()}'/>'>${i + 1}</a></td>
+								<td><c:out value="${questionList.get(i).getQst_title()}" /></td>
+								<td><a
+									href='<c:url value='/sample/problem?p_no=${questionList.get(i).getProb_num()}'/>'>${questionList.get(i).getProb_num()}</a></td>
+								<td><c:out value="${questionList.get(i).getM_id()}" /></td>
+								<td><c:out value="${numOfCommentsList.get(i)}" /></td>
+							</tr>
+						</c:forEach>
+					</c:if>
+
 
 				</tbody>
 			</table>
 		</div>
-	</div>
-	<div class="text-center" style="font-weight: bold; font-size: 5rem">
-		JAVA 문제 게시판</div>
-		
-	<div class="col-md-12">
-		<div class="table-responsive">
-			<table
-				class="table table-striped table-bordered sortable-table clickable-table"
-				id="problemset">
-				<thead>
-					<tr>
-						<th style="width: 25%" data-sort="int">문제 번호</th>
-						<th style="width: 50%" data-sort="string">제목</th>
-						<th style="width: 7%" data-sort="int">정답</th>
-						<th style="width: 15%" data-sort="int">제출</th>
-						<th style="width: 8%" data-sort="float">정답 비율</th>
-					</tr>
-				</thead>
-				<tbody>
-					<c:forEach items="${jlist}" var="jlist">
-						<tr>
-							<td><a
-								href='<c:url value='/sample/jproblem?p_no=${jlist.getP_num()}'/>'>${jlist.getP_num()}</a></td>
-							<td><c:out value="${jlist.getP_title()}" /></td>
-							<td><c:out value="${jlist.getOk_cnt()}" /></td>
-							<td><c:out value="${jlist.getSub_cnt()}" /></td>
-							<c:if test="${jlist.getSub_cnt()==0}">
-								<td>0%</td>
-							</c:if>
-							<c:if test="${jlist.getSub_cnt()!=0}">
-								<td><c:out
-										value="${ jlist.getOk_cnt()*100/jlist.getSub_cnt()}%" /></td>
-							</c:if>
-						</tr>
-					</c:forEach>
-
-				</tbody>
-			</table>
-		</div>
+		<a href="askQuestion" class="btn btn-primary pull-right">질문하기</a>
 	</div>
 
 	<br />
@@ -189,7 +155,9 @@ input[type="submit"] {
 		<input type="text" name=chat_content id="chat_content"
 			style="width: 200px;"> <input type="submit" value="채팅보내기"
 			id="chat_btn" style="width: 80px">
-		<%}%>
+		<%
+			}
+		%>
 	</div>
 
 	<script src="http://code.jquery.com/jquery-latest.min.js"></script>

@@ -4,12 +4,15 @@ import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
+import java.util.List;
 import java.util.Locale;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import org.json.simple.JSONArray;
+import org.json.simple.parser.JSONParser;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -26,6 +29,10 @@ import com.spring.board.MemberDAO;
 import com.spring.board.MemberDto;
 import com.spring.board.ProblemDAO;
 import com.spring.board.ProblemDto;
+import com.spring.board.QuestionCommentDAO;
+import com.spring.board.QuestionCommentDto;
+import com.spring.board.QuestionDAO;
+import com.spring.board.QuestionDto;
 import com.spring.board.SubmitLogDAO;
 import com.spring.board.SubmitLogDto;
 
@@ -84,7 +91,7 @@ public class SampleController {
 	@RequestMapping(value = "/join")
 	public String getJoin(Model model, HttpServletRequest request, HttpServletResponse reponse) throws Exception {
 		model.addAttribute("memberDto", new MemberDto());
-		
+
 		return "joinForm";
 	}
 
@@ -229,7 +236,7 @@ public class SampleController {
 		// System.out.println(md.getId() +"," + md.getSql()+pnum);
 		JProblemDAO jpd = JProblemDAO.getInstance();
 		JProblemDto jpDto = jpd.select_num(pnum);
-		
+
 		SubmitLogDto sDto = new SubmitLogDto();
 		sDto.setM_ID(md.getId());
 		sDto.setProb_num(pnum);
@@ -242,10 +249,9 @@ public class SampleController {
 			sDto.setSub_answer("F");
 			model.addAttribute("answer", "틀렸습니다.");
 		}
-		
+
 		SubmitLogDAO sd = SubmitLogDAO.getInstance();
 		sd.insert(sDto);
-		
 
 		return "problemResult";
 	}
@@ -271,6 +277,105 @@ public class SampleController {
 	public String getLogout(HttpServletRequest request, HttpSession session) throws Exception {
 		session.invalidate();
 		return "redirect:/sample/";
+	}
+
+	@RequestMapping(value = "/questionlist")
+	public String getQuestionList(Model model, HttpServletRequest request, HttpServletResponse reponse)
+			throws Exception {
+		List<QuestionDto> questionList = QuestionDAO.getInstance().selectAll();
+		List<Integer> numOfCommentsList = new ArrayList<>();
+		for (int i = 0; i < questionList.size(); i++) {
+			int count = QuestionCommentDAO.getInstance().countComments(questionList.get(i).getM_id(),
+					questionList.get(i).getProb_num(), questionList.get(i).getQst_date());
+			numOfCommentsList.add(count);
+		}
+
+		model.addAttribute("questionList", questionList);
+		model.addAttribute("numOfCommentsList", numOfCommentsList);
+		return "question_list";
+	}
+
+	@RequestMapping(value = "/question")
+	public String getQuestion(HttpServletRequest request, HttpServletResponse reponse) throws Exception {
+		QuestionDto question = QuestionDAO.getInstance().selectQuestion(request.getParameter("m_id"),
+				Integer.parseInt(request.getParameter("prob_num")), request.getParameter("qst_date"));
+		List<QuestionCommentDto> comments = QuestionCommentDAO.getInstance().selectComments(
+				request.getParameter("m_id"), Integer.parseInt(request.getParameter("prob_num")),
+				request.getParameter("qst_date"));
+
+		request.setAttribute("question", question);
+		request.setAttribute("comments", comments);
+
+		return "question";
+	}
+
+	@RequestMapping(value = "/question_update")
+	public String updateQuestion(HttpServletRequest request, HttpServletResponse reponse) throws Exception {
+		QuestionDto question = QuestionDAO.getInstance().selectQuestion(request.getParameter("m_id"),
+				Integer.parseInt(request.getParameter("prob_num")), request.getParameter("qst_date"));
+
+		request.setAttribute("question", question);
+
+		return "questionUpdate";
+	}
+
+	@RequestMapping(value = "/updateQuestion.do")
+	public String doUpdateQuestion(HttpServletRequest request, HttpServletResponse reponse) throws Exception {
+		request.setCharacterEncoding("utf-8");
+		QuestionDAO.getInstance().updateQuestion(request.getParameter("m_id"),
+				Integer.parseInt(request.getParameter("prob_num")), request.getParameter("qst_date"),
+				request.getParameter("qst_title"), request.getParameter("qst_body"));
+
+		return "redirect:/sample/questionlist";
+	}
+
+	@RequestMapping(value = "/question_delete")
+	public String deleteQuestion(HttpServletRequest request, HttpServletResponse reponse) throws Exception {
+		QuestionDAO.getInstance().deleteQuestion(request.getParameter("m_id"),
+				Integer.parseInt(request.getParameter("prob_num")), request.getParameter("qst_date"));
+
+		return "redirect:/sample/questionlist";
+	}
+
+	@RequestMapping(value = "/askQuestion")
+	public String askQuestion(HttpServletRequest request, HttpServletResponse reponse) throws Exception {
+		List<ProblemDto> problemList = ProblemDAO.getInstance().select_all();
+		request.setAttribute("problemList", problemList);
+		return "questionInsert";
+	}
+
+	@RequestMapping(value = "/insertQuestion.do")
+	public String doInsertQuestion(HttpServletRequest request, HttpServletResponse reponse) throws Exception {
+		request.setCharacterEncoding("utf-8");
+		QuestionDAO.getInstance().insertQuestion(request.getParameter("m_id"),
+				Integer.parseInt(request.getParameter("prob_num")), request.getParameter("qst_title"),
+				request.getParameter("qst_body"));
+
+		return "redirect:/sample/questionlist";
+	}
+
+	@RequestMapping(value = "/insertComment.do")
+	public String doInsertComment(Model model, HttpServletRequest request) throws Exception {
+		request.setCharacterEncoding("utf-8");
+		QuestionCommentDAO.getInstance().insertComment(request.getParameter("q_id"), request.getParameter("qc_id"),
+				Integer.parseInt(request.getParameter("prob_num")), request.getParameter("qst_date"),
+				request.getParameter("qc_body"));
+		model.addAttribute("commentList", QuestionCommentDAO.getInstance().selectComments(request.getParameter("q_id"),
+				Integer.parseInt(request.getParameter("prob_num")), request.getParameter("qst_date")));
+
+		return "commentList";
+	}
+
+	@RequestMapping(value = "/deleteComment.do")
+	public String doDeleteComment(Model model, HttpServletRequest request) throws Exception {
+		request.setCharacterEncoding("utf-8");
+		QuestionCommentDAO.getInstance().deleteComment(request.getParameter("q_id"), request.getParameter("qc_id"),
+				Integer.parseInt(request.getParameter("prob_num")), request.getParameter("qst_date"),
+				request.getParameter("qc_date"), request.getParameter("qc_body"));
+		model.addAttribute("commentList", QuestionCommentDAO.getInstance().selectComments(request.getParameter("q_id"),
+				Integer.parseInt(request.getParameter("prob_num")), request.getParameter("qst_date")));
+
+		return "commentList";
 	}
 
 	@ResponseBody

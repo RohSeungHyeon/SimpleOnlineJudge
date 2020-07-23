@@ -88,6 +88,9 @@ input[type="submit"] {
 					<li class="topbar-devider"></li>
 
 					<li><a href="/board/sample/post">공지사항</a></li>
+					<li class="topbar-devider"></li>
+					
+					<li><a href="/board/sample/questionlist">질문 게시판</a></li>
 					
 				</ul>
 			</div>

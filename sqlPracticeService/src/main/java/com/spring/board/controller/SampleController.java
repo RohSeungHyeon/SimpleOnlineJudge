@@ -348,8 +348,8 @@ public class SampleController {
 	public String doInsertQuestion(HttpServletRequest request, HttpServletResponse reponse) throws Exception {
 		request.setCharacterEncoding("utf-8");
 		QuestionDAO.getInstance().insertQuestion(request.getParameter("m_id"),
-				Integer.parseInt(request.getParameter("prob_num")), request.getParameter("qst_title"),
-				request.getParameter("qst_body"));
+				Integer.parseInt(request.getParameter("prob_num")), request.getParameter("qst_body"),
+				request.getParameter("qst_title"));
 
 		return "redirect:/sample/questionlist";
 	}

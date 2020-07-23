@@ -11,8 +11,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-import org.json.simple.JSONArray;
-import org.json.simple.parser.JSONParser;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -91,7 +89,7 @@ public class SampleController {
 	@RequestMapping(value = "/join")
 	public String getJoin(Model model, HttpServletRequest request, HttpServletResponse reponse) throws Exception {
 		model.addAttribute("memberDto", new MemberDto());
-
+		
 		return "joinForm";
 	}
 
@@ -236,7 +234,7 @@ public class SampleController {
 		// System.out.println(md.getId() +"," + md.getSql()+pnum);
 		JProblemDAO jpd = JProblemDAO.getInstance();
 		JProblemDto jpDto = jpd.select_num(pnum);
-
+		
 		SubmitLogDto sDto = new SubmitLogDto();
 		sDto.setM_ID(md.getId());
 		sDto.setProb_num(pnum);
@@ -249,9 +247,10 @@ public class SampleController {
 			sDto.setSub_answer("F");
 			model.addAttribute("answer", "틀렸습니다.");
 		}
-
+		
 		SubmitLogDAO sd = SubmitLogDAO.getInstance();
 		sd.insert(sDto);
+		
 
 		return "problemResult";
 	}
@@ -279,6 +278,72 @@ public class SampleController {
 		return "redirect:/sample/";
 	}
 
+	@ResponseBody
+	@RequestMapping(value = "/chat")
+	public String doChat(ChatDto chat_data, HttpServletRequest request) throws Exception {
+		HttpSession session = request.getSession();
+		MemberDto md = (MemberDto) session.getAttribute("member");
+		msg = chat_data.getContent();
+		msg = "\n" + md.getId() + " = " + msg;
+		System.out.println(msg);
+		return msg;
+	}
+
+//	/produces = "application/text; charset=utf8" �븳湲�源⑥쭚 �닔�젙踰�, json 蹂대궪�뻽 application/json;
+	@ResponseBody
+	@RequestMapping(value = "/getChat", produces = "application/text; charset=utf8")
+	public String getChat(HttpServletRequest request, HttpServletResponse reponse) throws Exception {
+		return msg;
+	}
+
+	@ResponseBody
+	@RequestMapping(value = "/message")
+	public String changeMessage(@RequestParam(value = "message") String str, HttpServletRequest request)
+			throws Exception {
+		HttpSession session = request.getSession();
+		MemberDto md = (MemberDto) session.getAttribute("member");
+		MemberDAO.getInstance().update_message(md, str);
+		System.out.println(str);
+		return msg;
+	}
+	//jihun add
+	@RequestMapping(value = "/post.jsp")
+	public String getPost(HttpServletRequest request, HttpServletResponse reponse) throws Exception {
+		System.out.println("write");
+		return "post";
+	}
+	@RequestMapping(value = "/write.jsp")
+	public String getWritejsp(HttpServletRequest request, HttpServletResponse reponse) throws Exception {
+		System.out.println("write");
+		return "write";
+	}
+	@RequestMapping(value = "/writeAction.jsp")
+	public String getWriteActionjsp(HttpServletRequest request, HttpServletResponse reponse) throws Exception {
+		System.out.println("writeAction");
+		return "writeAction";
+	}
+	@RequestMapping(value = "/view.jsp")
+	public String getView(HttpServletRequest request, HttpServletResponse reponse) throws Exception {
+		System.out.println("view");
+		return "view";
+	}
+	@RequestMapping(value = "/update.jsp")
+	public String getUpdate(HttpServletRequest request, HttpServletResponse reponse) throws Exception {
+		System.out.println("update");
+		return "update";
+	}
+	@RequestMapping(value = "/updateAction.jsp")
+	public String getUpdateActionjsp(HttpServletRequest request, HttpServletResponse reponse) throws Exception {
+		System.out.println("updateAction");
+		return "updateAction";
+	}
+	@RequestMapping(value = "/deleteAction.jsp")
+	public String getDeleteActionjsp(HttpServletRequest request, HttpServletResponse reponse) throws Exception {
+		System.out.println("deleteAction");
+		return "deleteAction";
+	}
+	
+	//Roseung add
 	@RequestMapping(value = "/questionlist")
 	public String getQuestionList(Model model, HttpServletRequest request, HttpServletResponse reponse)
 			throws Exception {
@@ -348,8 +413,8 @@ public class SampleController {
 	public String doInsertQuestion(HttpServletRequest request, HttpServletResponse reponse) throws Exception {
 		request.setCharacterEncoding("utf-8");
 		QuestionDAO.getInstance().insertQuestion(request.getParameter("m_id"),
-				Integer.parseInt(request.getParameter("prob_num")), request.getParameter("qst_title"),
-				request.getParameter("qst_body"));
+				Integer.parseInt(request.getParameter("prob_num")), request.getParameter("qst_body"),
+				request.getParameter("qst_title"));
 
 		return "redirect:/sample/questionlist";
 	}
@@ -378,68 +443,4 @@ public class SampleController {
 		return "commentList";
 	}
 
-	@ResponseBody
-	@RequestMapping(value = "/chat")
-	public String doChat(ChatDto chat_data, HttpServletRequest request) throws Exception {
-		HttpSession session = request.getSession();
-		MemberDto md = (MemberDto) session.getAttribute("member");
-		msg = chat_data.getContent();
-		msg = "\n" + md.getId() + " = " + msg;
-		System.out.println(msg);
-		return msg;
-	}
-
-//	/produces = "application/text; charset=utf8" �븳湲�源⑥쭚 �닔�젙踰�, json 蹂대궪�뻽 application/json;
-	@ResponseBody
-	@RequestMapping(value = "/getChat", produces = "application/text; charset=utf8")
-	public String getChat(HttpServletRequest request, HttpServletResponse reponse) throws Exception {
-		return msg;
-	}
-
-	@ResponseBody
-	@RequestMapping(value = "/message")
-	public String changeMessage(@RequestParam(value = "message") String str, HttpServletRequest request)
-			throws Exception {
-		HttpSession session = request.getSession();
-		MemberDto md = (MemberDto) session.getAttribute("member");
-		MemberDAO.getInstance().update_message(md, str);
-		System.out.println(str);
-		return msg;
-	}
-	//jihun add
-	@RequestMapping(value = "/post.jsp")
-	public String getPost(HttpServletRequest request, HttpServletResponse reponse) throws Exception {
-		System.out.println("write");
-		return "post";
-	}
-	@RequestMapping(value = "/write.jsp")
-	public String getWritejsp(HttpServletRequest request, HttpServletResponse reponse) throws Exception {
-		System.out.println("write");
-		return "write";
-	}
-	@RequestMapping(value = "/writeAction.jsp")
-	public String getWriteActionjsp(HttpServletRequest request, HttpServletResponse reponse) throws Exception {
-		System.out.println("writeAction");
-		return "writeAction";
-	}
-	@RequestMapping(value = "/view.jsp")
-	public String getView(HttpServletRequest request, HttpServletResponse reponse) throws Exception {
-		System.out.println("view");
-		return "view";
-	}
-	@RequestMapping(value = "/update.jsp")
-	public String getUpdate(HttpServletRequest request, HttpServletResponse reponse) throws Exception {
-		System.out.println("update");
-		return "update";
-	}
-	@RequestMapping(value = "/updateAction.jsp")
-	public String getUpdateActionjsp(HttpServletRequest request, HttpServletResponse reponse) throws Exception {
-		System.out.println("updateAction");
-		return "updateAction";
-	}
-	@RequestMapping(value = "/deleteAction.jsp")
-	public String getDeleteActionjsp(HttpServletRequest request, HttpServletResponse reponse) throws Exception {
-		System.out.println("deleteAction");
-		return "deleteAction";
-	}
 }
